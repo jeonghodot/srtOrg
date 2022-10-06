@@ -207,7 +207,7 @@ class SRT:
         iter = num_iteration
         # print(iter)
         for i in range(iter):
-            print(f"총 {iter}장의 기차표 중에 {i+1}번째", end=" ")
+            print(f"총 {iter}장의 좌석 중에 {i+1}번째", end=" ")
             self.run_driver()
             self.set_log_info(login_id, login_psw)
             self.login()
