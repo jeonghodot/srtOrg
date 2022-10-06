@@ -70,6 +70,7 @@ class SRT:
         try:
             webdriver_options = webdriver.ChromeOptions()
             webdriver_options.add_argument('--headless')
+            webdriver_options.add_experimental_option('excludeSwitches', ['enable-logging'])
 
             # chromedriver = 'C:/dev_python/Webdriver/chromedriver.exe'
             self.driver = webdriver.Chrome(chromedriver_path, options=webdriver_options )
@@ -207,6 +208,7 @@ class SRT:
         iter = num_iteration
         # print(iter)
         for i in range(iter):
+            print('*'*100)
             print(f"총 {iter}장의 좌석 중에 {i+1}번째", end=" ")
             self.run_driver()
             self.set_log_info(login_id, login_psw)
