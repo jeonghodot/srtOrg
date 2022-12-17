@@ -70,7 +70,10 @@ class SRT:
         try:
             webdriver_options = webdriver.ChromeOptions()
             webdriver_options.add_argument('--headless')
-            webdriver_options.add_experimental_option('excludeSwitches', ['enable-logging'])
+            webdriver_options.add_argument('--log-level=3')
+
+            # webdriver_options.add_experimental_option('excludeSwitches', ['enable-logging'])
+            
 
             # chromedriver = 'C:/dev_python/Webdriver/chromedriver.exe'
             self.driver = webdriver.Chrome(chromedriver_path, options=webdriver_options )
@@ -208,14 +211,16 @@ class SRT:
         iter = num_iteration
         # print(iter)
         for i in range(iter):
-            print('*'*100)
-            print(f"총 {iter}장의 좌석 중에 {i+1}번째", end=" ")
-            self.run_driver()
-            self.set_log_info(login_id, login_psw)
-            self.login()
-            self.go_search()
-            self.refresh_search_result()
-
+            try:
+                print('*'*100)
+                print(f"총 {iter}장의 좌석 중에 {i+1}번째", end=" ")
+                self.run_driver()
+                self.set_log_info(login_id, login_psw)
+                self.login()
+                self.go_search()
+                self.refresh_search_result()
+            except Exception:
+                print("예상치 못한 오류가 발생했습니다.")
 
 # if __name__ == "__main__":
 #     srt_id = os.environ.get('srt_id')
