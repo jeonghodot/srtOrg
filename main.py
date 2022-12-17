@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 import os
 import time
-import sys
+import telegram
+
 from random import randint
 from datetime import datetime
 from selenium import webdriver
@@ -20,6 +21,17 @@ from validation import station_list
 chromedriver_path = os.path.dirname(os.path.realpath(__file__))+'\chromedriver.exe'
 # print(chromedriver_path)
 # chromedriver_path = r'C:\workspace\chromedriver.exe'
+
+
+# api_key = '5647557476:AAEhxeYRXI_srzcVjkJT6Mdi_SErfD6zXAw'
+api_key = '5957545379:AAFAHTqrMAqMAWUsD9EkT3XvLcsu0snQgRU'
+chatId = '5517769456'
+bot = telegram.Bot(token=api_key)
+# print('start')
+for item in bot.getUpdates():
+    print(item)
+# bot.sendMessage(chat_id = chatId, text='   ')
+
 
 class SRT:
     def __init__(self, dpt_stn, arr_stn, dpt_dt, dpt_tm, num_trains_to_check=2, want_reserve=False, num_iteration=1):
@@ -49,6 +61,12 @@ class SRT:
         self.cnt_refresh = 0  # 새로고침 회수 기록
 
         self.check_input()
+
+
+
+
+
+
 
     def check_input(self):
         if self.dpt_stn not in station_list:
@@ -139,9 +157,9 @@ class SRT:
         elm_dpt_tm = self.driver.find_element(By.ID, "dptTm")
         self.driver.execute_script("arguments[0].setAttribute('style','display: True;')", elm_dpt_tm)
         Select(self.driver.find_element(By.ID, "dptTm")).select_by_visible_text(self.dpt_tm)
-
         print("좌석을 조회합니다")
-        print(f"출발역:{self.dpt_stn} | 도착역:{self.arr_stn} | 날짜:{self.dpt_dt} | 시간:{self.dpt_tm}시 이후 | {self.num_trains_to_check}개의 기차 예약 | 예약 대기 사용:{self.want_reserve}")
+        print(f"출발역:{self.dpt_stn} | 도착역:{self.arr_stn} | 날짜:{self.dpt_dt} | 시간:{self.dpt_tm}시 이후 | {self.num_trains_to_check}개의 기차 예약 | 예약 대기:{self.want_reserve}")
+        bot.sendMessage(chat_id=chatId, text=f"출발역:{self.dpt_stn} | 도착역:{self.arr_stn} | 날짜:{self.dpt_dt} | 시간:{self.dpt_tm}시 이후 | {self.num_trains_to_check}개의 기차 예약 | 예약 대기:{self.want_reserve}")
         # print(f"예약 대기 사용: {self.want_reserve}")
 
         # 조회하기 버튼 클릭
@@ -150,6 +168,8 @@ class SRT:
         time.sleep(1)
 
     def refresh_search_result(self):
+        SCount = 0
+        SRCount = 0
         while True:
             for i in range(1, self.num_trains_to_check+1):
                 try:
@@ -174,7 +194,10 @@ class SRT:
                     # 예약이 성공하면
                     if self.driver.find_elements(By.ID, 'isFalseGotoMain'):
                         is_booked = True
+                        SCount += 1
                         print("예약 성공")
+                        bot.sendMessage(chat_id=chatId, text='예약 성공 {}'.format(SCount))
+
                         return self.driver
                     else:
                         print("잔여석 없음. 다시 검색")
@@ -183,9 +206,13 @@ class SRT:
 
                 if self.want_reserve:
                     if "신청하기" in reservation:
+                        SRCount += 1
                         print("예약 대기 완료")
+                        bot.sendMessage(chat_id=chatId, text='대기 예약 성공 {}'.format(SRCount))
+
                         self.driver.find_element(By.CSS_SELECTOR, f"#result-form > fieldset > div.tbl_wrap.th_thead > table > tbody > tr:nth-child({i}) > td:nth-child(8) > a").click()
                         is_booked = True
+
                         return self.driver
 
             if not self.is_booked:
@@ -214,6 +241,7 @@ class SRT:
             try:
                 print('*'*100)
                 print(f"총 {iter}장의 좌석 중에 {i+1}번째", end=" ")
+                bot.sendMessage(chat_id = chatId, text=f"총 {iter}장의 좌석 중에 {i+1}번째")
                 self.run_driver()
                 self.set_log_info(login_id, login_psw)
                 self.login()
